@@ -1,0 +1,57 @@
+__author__ = 'skmathur'
+import random
+import pylab as P
+import matplotlib.pyplot as plt
+import numpy as np
+
+#_________________________
+# QUESTION 1.1
+#-------------------------
+'''
+print 'QUESTION 1.1 - see plot in other window'
+#beta distribution
+alpha, beta = 2,2
+betadistr=[]
+for i in range(10000):
+    betadistr.append(random.betavariate(alpha, beta))
+mu, sigma = 200, 25
+
+# the histogram of PDF the data with histtype='step'
+n, bins, patches = P.hist(betadistr, 100, normed=1, histtype='stepfilled')
+P.setp(patches, 'facecolor', 'black', 'alpha', 0.65)
+#P.show()
+'''
+#_________________________
+# QUESTION 1.2
+#-------------------------
+print 'QUESTION 1.2'
+print 'The PDF of the special auction will look more like the beta distribution where' \
+      'alpha and beta are 1/2. There are a few people who will value each item highly, but' \
+      'most will have values near zero.'
+
+#_________________________
+# QUESTION 2.1
+#-------------------------
+print 'QUESTION 2.1'
+
+    #Second Price Auction Function
+def secondprice(n_bidders,alpha=0.5,beta=0.5):
+    bids=[]
+    for i in range(n_bidders):
+        bids.append(random.betavariate(alpha, beta))
+    bids.sort()
+    revenue = bids[-2]
+    return revenue
+
+n_bidders = [2,3,4,5,10,20]
+graphdata = []
+for n in n_bidders:
+    revenue_special = secondprice(n,.5,.5)
+    revenue_normal  = secondprice(n,2,2)
+    graphdata.append([n, revenue_special, revenue_normal])
+graphdata = np.array(graphdata)
+print 'n bidders\tspecialty revenue\tnormal auction\n',graphdata
+
+plt.plot(n_bidders,graphdata[::,1])
+plt.plot(n_bidders,graphdata[::,2])
+plt.show()
