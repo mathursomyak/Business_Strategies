@@ -47,13 +47,20 @@ def secondprice(n_bidders,alpha=0.5,beta=0.5):
 n_bidders = [2,3,4,5,10,20] #the different numbers of bidders we test
 graphdata = []  #collection of the resulting simulated revenues
 for n in n_bidders:
-    revenue_special = secondprice(n,.5,.5)
-    revenue_normal  = secondprice(n,2,2)
+    revenue_normal,revenue_special=0,0
+    for i in range(10): #to get the average of 10 auctions
+        revenue_normal += secondprice(n,2,2)
+        revenue_special+= secondprice(n,.5,.5)
+    revenue_normal,revenue_special= revenue_normal/10.0, revenue_special/10.0
     graphdata.append([n, revenue_special, revenue_normal])
 graphdata = np.array(graphdata)
 print 'n bidders\tspecialty revenue\tnormal auction\n',graphdata
 
 #Plot the graph data to compare revenue between the 2 beta distributions
-plt.plot(n_bidders,graphdata[::,1])
-plt.plot(n_bidders,graphdata[::,2])
+special = plt.plot(n_bidders,graphdata[::,1])
+normal = plt.plot(n_bidders,graphdata[::,2])
+plt.title('House Revenue by Number of Bidders')
+plt.xlabel('Number of Bidders')
+plt.ylabel('Auction House Revenue')
+plt.legend( (special[0], normal[0]), ('Special', 'Normal') )
 plt.show()
