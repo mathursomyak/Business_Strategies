@@ -64,3 +64,4 @@ plt.xlabel('Number of Bidders')
 plt.ylabel('Auction House Revenue')
 plt.legend( (special[0], normal[0]), ('Special', 'Normal') )
 plt.show()
+
