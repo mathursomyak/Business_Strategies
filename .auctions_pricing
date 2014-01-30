@@ -1,26 +1,41 @@
 __author__ = 'skmathur'
 import random
-import pylab as P
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import stats
 
 #_________________________
 # QUESTION 1.1
 #-------------------------
-'''
+
 print 'QUESTION 1.1 - see plot in other window'
 #beta distribution
+betadistr1=[]
+betadistr2=[]
+
 alpha, beta = 2,2
-betadistr=[]
-for i in range(10000):
-    betadistr.append(random.betavariate(alpha, beta))
-mu, sigma = 200, 25
+for i in range(100):
+    y=stats.beta.pdf(i/100.0,alpha,beta)
+    betadistr1.append(y)
+
+alpha, beta = 0.5,0.5
+for i in range(100):
+    y=stats.beta.pdf(i/100.0,alpha,beta)
+    betadistr2.append(y)
 
 # the histogram of PDF the data with histtype='step'
-n, bins, patches = P.hist(betadistr, 100, normed=1, histtype='stepfilled')
-P.setp(patches, 'facecolor', 'black', 'alpha', 0.65)
-P.show()
-'''
+X = np.arange(0, 1, 0.01)
+X = list(X)
+print X,'\n',betadistr1
+print len(betadistr1), len(X)
+plt.figure()
+plt.plot(X, betadistr1, linewidth=2.0)
+plt.plot(X, betadistr2, linewidth=2.0)
+plt.title('Distribution of Bids Used for Simulation')
+plt.xlabel('Probability of Bid')
+plt.ylabel('Simulated Bid Value')
+plt.legend(('Beta(a=2,b=2)', 'Beta(a=0.5,b=0.5)'), loc="upper right")
+
 #_________________________
 # QUESTION 1.2
 #-------------------------
@@ -29,10 +44,12 @@ print 'The PDF of the special auction will look more like the beta distribution 
       'alpha and beta are 1/2. There are a few people who will value each item highly, but' \
       'most will have values near zero.'
 
+
 #_________________________
 # QUESTION 2.1
 #-------------------------
 print 'QUESTION 2.1'
+
 
 #Second Price Auction Function
 def secondprice(n_bidders,alpha=0.5,beta=0.5):
@@ -44,26 +61,28 @@ def secondprice(n_bidders,alpha=0.5,beta=0.5):
     return revenue
 
 #Run the simulation for both beta distributions
-n_bidders = [2,3,4,5,10,20] #the different numbers of bidders we test
+n_bidders = range(2,21)
+N = 150
 graphdata = []  #collection of the resulting simulated revenues
 for n in n_bidders:
     revenue_normal,revenue_special=[],[]
-    for i in range(50): #to get the average of 10 auctions
+    for i in range(N): #to get the average of 10 auctions
         revenue_normal.append(secondprice(n,2,2))
         revenue_special.append (secondprice(n,.5,.5))
     revenue_normal_avg,revenue_special_avg= np.mean(revenue_normal), np.mean(revenue_special)
-    revenue_normal_std,revenue_special_std= np.std(revenue_normal), np.std(revenue_special)
-    graphdata.append([n, revenue_special_avg, revenue_normal_avg, revenue_special_std, revenue_normal_std])
+    revenue_normal_var,revenue_special_var= np.var(revenue_normal), np.var(revenue_special)
+    graphdata.append([n, revenue_special_avg, revenue_normal_avg, revenue_special_var, revenue_normal_var])
 graphdata = np.array(graphdata)
-print 'n bidders\tspecialty revenue\tnormal\tsp standev\tnorm standev\n',graphdata
+#print 'n bidders\tspecialty revenue\tnormal\tsp standev\tnorm standev\n',graphdata
 
 #Plot the graph data to compare revenue between the 2 beta distributions
+plt.figure()
 special = plt.plot(n_bidders,graphdata[::,1])
-plt.fill_between(n_bidders, graphdata[::,1]-graphdata[::,3], graphdata[::,1]+graphdata[::,3], facecolor='yellow', alpha=0.25)
+plt.fill_between(n_bidders, graphdata[::,1]-1.96*np.sqrt(graphdata[::,3]/float(N)), graphdata[::,1]+1.96*np.sqrt(graphdata[::,3]/float(N)), facecolor='yellow', alpha=0.25)
 normal = plt.plot(n_bidders,graphdata[::,2])
-plt.fill_between(n_bidders, graphdata[::,2]-graphdata[::,4], graphdata[::,2]+graphdata[::,4], facecolor='orange', alpha=0.25)
+plt.fill_between(n_bidders, graphdata[::,2]-1.96*np.sqrt(graphdata[::,4]/float(N)), graphdata[::,2]+1.96*np.sqrt(graphdata[::,4]/float(N)), facecolor='orange', alpha=0.25)
 plt.title('House Revenue by Number of Bidders')
 plt.xlabel('Number of Bidders')
 plt.ylabel('Auction House Revenue')
-plt.legend( (special[0], normal[0]), ('Special', 'Normal') )
+plt.legend( (special[0], normal[0]), ('Special', 'Normal'),loc="lower right")
 plt.show()
